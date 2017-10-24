@@ -35,6 +35,11 @@
 
 uchar serno_read = 0;
 uchar serno[6];
+uint16_t relay_timer;
+
+#define CUSTOM_DESCR_LENGTH 6
+
+uint8_t  mySerialNumber[16];
 
 PROGMEM const char usbHidReportDescriptor[22] = {
 	0x06, 0x00, 0xff,		/* USAGE PAGE (Generic Desktop) */
@@ -64,6 +69,22 @@ void fetch_serno(void)
 		}
 		serno_read = 1;
 	}
+}
+
+usbMsgLen_t usbFunctionDescriptor(struct usbRequest *rq)
+{
+  fetch_serno();
+
+  mySerialNumber[0] = (2 * CUSTOM_DESCR_LENGTH) + 2;  // using UTF-16 it seems
+  mySerialNumber[1] = (3);  // defined by USB spec
+  uint8_t xx;
+  for(xx = 0; xx < CUSTOM_DESCR_LENGTH; xx++) {
+    mySerialNumber[(xx * 2) + 2] = serno[xx];
+    mySerialNumber[(xx * 2) + 3] = 0;
+  }
+
+  usbMsgPtr = (usbMsgPtr_t)mySerialNumber;
+  return mySerialNumber[0];
 }
 
 void update_serno(uchar *buf, uchar len)
@@ -118,6 +139,7 @@ uchar usbFunctionRead(uchar *data, uchar len)
 
 uchar usbFunctionWrite(uchar *data, uchar len)
 {
+  relay_timer = 5000; // about 5 seconds
 	if (data[0] == CMD_ALL_ON) {
 		PORTB |= RELAY_BIT;
 	} else if (data[0] == CMD_ALL_OFF) {
@@ -157,10 +179,18 @@ int __attribute__((noreturn)) main(void)
 	/* Set the relay bit to output mode */
 	DDRB |= RELAY_BIT;
 
+  relay_timer = 0;
 	sei(); /* We're ready to go; enable interrupts */
 
 	while (1) {
 		wdt_reset();
 		usbPoll();
+    if (relay_timer) {
+      _delay_ms(1);
+      --relay_timer;
+      if (relay_timer == 0) {
+        PORTB &= ~(RELAY_BIT);
+      }
+    }
 	}
 }

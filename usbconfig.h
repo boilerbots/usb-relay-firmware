@@ -245,8 +245,8 @@ extern void calibrateOscillator(void);
 #define USB_CFG_DEVICE_VERSION  0x00, 0x01
 /* Version number of the device: Minor number first, then major number.
  */
-#define USB_CFG_VENDOR_NAME     'w', 'w', 'w', '.', 'd', 'c', 't', 't', 'e', 'c', 'h', '.', 'c', 'o', 'm'
-#define USB_CFG_VENDOR_NAME_LEN 15
+#define USB_CFG_VENDOR_NAME     'b', 'o', 'i', 'l', 'e', 'r', 'b', 'o', 't', 's'
+#define USB_CFG_VENDOR_NAME_LEN 10
 /* These two values define the vendor name returned by the USB device. The name
  * must be given as a list of characters under single quotes. The characters
  * are interpreted as Unicode (UTF-16) entities.
@@ -354,7 +354,7 @@ extern void calibrateOscillator(void);
 #define USB_CFG_DESCR_PROPS_STRING_0                0
 #define USB_CFG_DESCR_PROPS_STRING_VENDOR           0
 #define USB_CFG_DESCR_PROPS_STRING_PRODUCT          0
-#define USB_CFG_DESCR_PROPS_STRING_SERIAL_NUMBER    0
+#define USB_CFG_DESCR_PROPS_STRING_SERIAL_NUMBER    (USB_PROP_IS_DYNAMIC | USB_PROP_IS_RAM | USB_PROP_LENGTH(6))
 #define USB_CFG_DESCR_PROPS_HID                     0
 #define USB_CFG_DESCR_PROPS_HID_REPORT              0
 #define USB_CFG_DESCR_PROPS_UNKNOWN                 0

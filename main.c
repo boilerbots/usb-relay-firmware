@@ -139,22 +139,12 @@ uchar usbFunctionRead(uchar *data, uchar len)
 
 uchar usbFunctionWrite(uchar *data, uchar len)
 {
-  relay_timer = 5000; // about 5 seconds
-	if (data[0] == CMD_ALL_ON) {
-		PORTB |= RELAY_BIT;
-	} else if (data[0] == CMD_ALL_OFF) {
-		PORTB &= ~(RELAY_BIT);
-	} else if (data[0] == CMD_ON) {
-		if (data[1] == 1) {
-			PORTB |= RELAY_BIT;
-		}
-	} else if (data[0] == CMD_OFF) {
-		if (data[1] == 1) {
-			PORTB &= ~(RELAY_BIT);
-		}
-	} else if (data[0] == CMD_SET_SERIAL) {
-		update_serno(&data[1], 6);
-	}
+	if (data[0] == 0) {
+    PORTB &= ~(RELAY_BIT);
+	} else {
+    PORTB |= RELAY_BIT;
+    relay_timer = data[0] * 1000;
+  }
 
 	return len;
 }

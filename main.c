@@ -27,11 +27,6 @@
 #include "libs-device/osccal.h"
 
 #define RELAY_BIT 8 /* Bit 3 on port B */
-#define CMD_ALL_ON 0xfe
-#define CMD_ALL_OFF 0xfc
-#define CMD_ON 0xff
-#define CMD_OFF 0xfd
-#define CMD_SET_SERIAL 0xfa
 
 uchar serno_read = 0;
 uchar serno[6];
@@ -85,23 +80,6 @@ usbMsgLen_t usbFunctionDescriptor(struct usbRequest *rq)
 
   usbMsgPtr = (usbMsgPtr_t)mySerialNumber;
   return mySerialNumber[0];
-}
-
-void update_serno(uchar *buf, uchar len)
-{
-	uchar i;
-
-	/*
-	 * I have no idea why this gets stored 3 times, but the original
-	 * firmware does it.
-	 */
-	eeprom_write_block(buf, (void *) 0x00, len);
-	eeprom_write_block(buf, (void *) 0x40, len);
-	eeprom_write_block(buf, (void *) 0x80, len);
-
-	for (i = 0; i < 6; i++) {
-		serno[i] = buf[i];
-	}
 }
 
 usbMsgLen_t usbFunctionSetup(uchar data[8])

@@ -1,27 +1,36 @@
 This is a basic firmware for the cheap USB relay boards that are sold on eBay
 and report themselves as being from www.dcttech.com. They're based on an Atmel
 ATtiny chip and run [V-USB](https://www.obdev.at/products/vusb/) as the core of
-their firmware. I wanted to play around with some ATtiny programming so figured a good way to start was to build a new firmware for the device I already had that mimicked the existing firmware. Currently it only supports the 1 port board, but I'm sure it could be easily extended by anyone with access to the boards with more relays on them. Patches welcome.
+their firmware. 
+
+This project deviates from the basic firmware in 2 ways.
+
+* Implement reading the serial number from the eeprom area.
+* Added a watchdog timer
+
+The HID driver sends a byte array to the device. Use the first byte to control the state of the relay, byte[0]=0 de-energize and byte[0]=1 energize.
+The second byte enables a watchdog timer count down with the value in seconds, byte[1]=5 would time out after approximately 5 seconds. The relay opens when decrementing to zero so if you leave the timer at zero it is effectively disabled.
 
 `apt install avr-libc avrdude` should install the appropriate build requirements on Debian (`gcc-avr` will be automatically pulled in) assuming you already have `build-essential` installed for `make`.
 
 `make` will then build you a main.hex which you can program to your device using
-`avrdude`. With my [Bus Pirate](http://dangerousprototypes.com/docs/Bus_Pirate) I use:
+`avrdude`. With my cheap [USBASP](http://www.fischl.de/usbasp/) I use:
 
-    avrdude -p attiny45 -c buspirate -P /dev/ttyUSB0 -U flash:w:main.hex:i
+    avrdude -P /dev/ttyUSB0 -c usbasp -p t45 -U flash:w:main.elf:e
+
 
 Pin outs on the 1 port relay board look like:
 
 <pre>
   |RELAY|
-  +-----+               [Bus Pirate connections]
-           o RESET      CS (white)
-           o SCK        CLK (purple)
-   +--+    o MISO       MISO (black)
-   |AT|    □ MOSI       MOSI (grey)
+  +-----+               [USBASP connections]
+           o RESET      RST
+           o SCK        CLK
+   +--+    o MISO       MISO
+   |AT|    □ MOSI       MOSI
    +--+
-           □ 5V         +5V (orange)
-           o GND        GND (brown)
+           □ 5V         +5V
+           o GND        GND
   | USB |
   +-----+
 </pre>

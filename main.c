@@ -143,8 +143,9 @@ uchar usbFunctionWrite(uchar *data, uchar len)
     PORTB &= ~(RELAY_BIT);
 	} else {
     PORTB |= RELAY_BIT;
-    relay_timer = data[0] * 1000;
   }
+
+  relay_timer = data[1] * 1000;
 
 	return len;
 }

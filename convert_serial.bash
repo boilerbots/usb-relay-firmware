@@ -12,5 +12,6 @@ echo "create serial rom file"
 echo "convert rom file to intel hex"
 srec_cat /tmp/serial.txt -ascii_hex -output /tmp/serial.hex -intel
 echo "program to device"
-avrdude -P /dev/ttyUSB0 -c jtagkey -p t45 -U eeprom:w:/tmp/serial.hex
+#avrdude -P /dev/ttyUSB0 -c jtagkey -p t45 -U eeprom:w:/tmp/serial.hex
+avrdude -P /dev/ttyUSB0 -c usbasp -p t45 -U eeprom:w:/tmp/serial.hex
 
